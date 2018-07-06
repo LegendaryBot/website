@@ -182,6 +182,6 @@ venv.bak/
 
 ### Python Patch ###
 .venv/
-
+db.sqlite3
 
 # End of https://www.gitignore.io/api/django,python,intellij
