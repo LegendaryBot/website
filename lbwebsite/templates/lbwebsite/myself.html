@@ -1,0 +1,10 @@
+{% extends 'template.html' %}
+{% block title %}My account{% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col">
+            <h2>Login to Battle.Net</h2>
+            <a href="{% url "social:begin" "battlenet-oauth2-us" %}" class="nav-link">Login</a>
+        </div>
+    </div>
+{% endblock %}

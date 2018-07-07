@@ -1,0 +1,47 @@
+{% extends 'template.html' %}
+{% load bootstrap4 %}
+{% block title %}Manage {% for server in servers %}{% if server.id == request.id %}{{ server.name }}{% endif %}{% endfor %}{% endblock %}
+
+{% block body %}
+    <div class="row">
+    <div class="col">
+        {% bootstrap_messages %}
+    </div>
+    </div>
+<div class="row my-3">
+    <div class="col">
+        <div class="alert alert-primary" role="alert">
+            Prefixes
+        </div>
+        <p>Legendarybot supports multiple prefixes to trigger commands. By default, Mentioning it (<b>@LegendaryBot</b>) and the use of the <b>!</b> prefix works. Once you set a custom prefix, the <b>!</b> prefix is disabled.</p>
+        {% if guild.guildprefix_set.count > 0 %}
+            <table class="table">
+                <tbody>
+                {% for prefix in guild.guildprefix_set.all %}
+                    <tr>
+                        <td>{{ prefix.prefix }}</td>
+                        <td><a href="{% url 'server_remove_prefix' guild_id=guild.guild_id prefix=prefix.prefix %}"><button type="button" class="btn btn-danger">Delete</button></a></td>
+                    </tr>
+
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>You currently have no prefixes</p>
+        {% endif %}
+        <form action="{% url 'server_prefix' guild_id=guild.guild_id %}" method="post">
+            {% csrf_token %}
+            {% bootstrap_form prefix_form %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            {% endbuttons %}
+
+
+        </form>
+    </div>
+    <div class="col">
+
+    </div>
+
+</div>
+{% endblock %}

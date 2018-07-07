@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'social_django'
+    'social_django',
+    'bootstrap4',
+    'sslserver'
 ]
 
 MIDDLEWARE = [
@@ -125,9 +127,35 @@ SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.discord.DiscordOAuth2',
+    'lbwebsite.auth.backends.BattleNetOauth2EU.BattleNetOAuth2EU',
+    'lbwebsite.auth.backends.BattleNetOauth2US.BattleNetOAuth2US',
     'django.contrib.auth.backends.ModelBackend',
 )
 
 SOCIAL_AUTH_DISCORD_KEY=os.getenv('DISCORD_KEY')
 SOCIAL_AUTH_DISCORD_SECRET=os.getenv('DISCORD_SECRET')
 SOCIAL_AUTH_DISCORD_SCOPE=['guilds']
+SOCIAL_AUTH_BATTLENET_OAUTH2_US_KEY=os.getenv('BATTLENET_KEY')
+SOCIAL_AUTH_BATTLENET_OAUTH2_US_SECRET=os.getenv('BATTLENET_SECRET')
+SOCIAL_AUTH_BATTLENET_OAUTH2_EU_KEY=os.getenv('BATTLENET_KEY')
+SOCIAL_AUTH_BATTLENET_OAUTH2_EU_SECRET=os.getenv('BATTLENET_SECRET')
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'lbwebsite.auth.pipeline.battlenet_pipeline.save_characters'
+)
+
+SOCIAL_AUTH_LOGIN_REDIRECT_URL='/'
+
+LOGIN_URL='/login/discord/'
+
+STATIC_URL = '/static/'
+

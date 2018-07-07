@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -10,7 +11,7 @@ class GuildPrefix(models.Model):
     prefix = models.CharField(max_length=10)
 
 
-class GuildCustomCommands(models.Model):
+class GuildCustomCommand(models.Model):
     guild = models.ForeignKey(Guild, on_delete=models.CASCADE)
 
     TEXT = 1
@@ -22,12 +23,12 @@ class GuildCustomCommands(models.Model):
     value = models.CharField(max_length=2000)
 
 
-class GuildServers(models.Model):
+class GuildServer(models.Model):
     guild = models.ForeignKey(Guild, on_delete=models.CASCADE)
 
-    US = 1,
-    EU = 2,
-    TW = 3,
+    US = 1
+    EU = 2
+    TW = 3
     KR = 4
 
     choices = (
@@ -40,3 +41,36 @@ class GuildServers(models.Model):
     server_slug = models.CharField(max_length=50)
     guild_name = models.CharField(max_length=50, null=True)
     default = models.BooleanField(default=False)
+
+
+class Character(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    US = 1
+    EU = 2
+    TW = 3
+    KR = 4
+
+    choices = (
+        (US, "US"),
+        (EU, "EU"),
+        (TW, "TW"),
+        (KR, "KR"),
+    )
+    region = models.IntegerField(choices=choices, default=US)
+    server_slug = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
+    guild_name = models.CharField(max_length=50, null=True, blank=True)
+    thumbnail = models.CharField(max_length=300)
+    main_for_guild = models.ForeignKey(Guild, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.region} - {self.server_slug} - {self.name} - {self.guild_name} - {self.thumbnail}"
+
+    def __eq__(self, other):
+        if isinstance(other, Character):
+            return self.region == other.region and self.server_slug == other.server_slug and self.name == other.name
+        return False
+
+    class Meta:
+        unique_together = (('user', 'main_for_guild'), ('region', 'server_slug', 'name'))
