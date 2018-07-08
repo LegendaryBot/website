@@ -28,6 +28,9 @@ class GuildCustomCommand(models.Model):
     type = models.IntegerField(choices=choices, default=TEXT)
     value = models.CharField(max_length=2000)
 
+    class Meta:
+        unique_together = (('guild', 'name'))
+
 
 class GuildServer(models.Model):
     guild = models.ForeignKey(DiscordGuild, on_delete=models.CASCADE)
