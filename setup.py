@@ -12,9 +12,7 @@ setuptools.setup(
     long_description="LegendaryBot website",
     long_description_content_type="text/markdown",
     url="https://github.com/LegendaryBot/website",
-    packages=[
-        "lbwebsite"
-    ],
+    packages=setuptools.find_packages(),
     install_requires=read_requirements('requirements.txt'),
     classifiers=(
         "Programming Language :: Python :: 3",
