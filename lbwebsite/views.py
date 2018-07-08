@@ -1,17 +1,18 @@
+import requests
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.shortcuts import render, redirect
 
 from lbwebsite.forms import PrefixForm
-from lbwebsite.models import Guild, GuildPrefix
+from lbwebsite.models import Guild, GuildPrefix, Character
 from . import context_processors
 
 def is_server_admin(request,id):
     if request.user.is_superuser:
         return True
     servers = context_processors.get_discord_servers(request)
-    for server in servers['servers']:
+    for server in servers['servers_admin']:
         if server['id'] == id:
             return True
     return False
@@ -62,7 +63,21 @@ def server_remove_prefix(request, guild_id, prefix):
         messages.add_message(request, messages.SUCCESS, f'Prefix {prefix} removed from the server!')
     return redirect('server', guild_id=guild_id)
 
+
 @login_required
 def myself(request):
-    social = request.user.social_auth
     return render(request, 'lbwebsite/myself.html')
+
+
+@login_required
+def myself_update(request, character_id):
+    if request.POST and request.user.is_authenticated:
+        selected_servers = request.POST.getlist('servers')
+        character = Character.objects.get(pk=character_id)
+        if character.user == request.user:
+            for server in selected_servers:
+                guild = Guild.objects.get(pk=server)
+                character.main_for_guild.add(guild)
+        character.save()
+        messages.add_message(request, messages.SUCCESS, f'Character {character.name} modified successfully.')
+    return redirect('myself')

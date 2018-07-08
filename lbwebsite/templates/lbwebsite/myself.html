@@ -1,10 +1,60 @@
 {% extends 'template.html' %}
+{% load static %}
 {% block title %}My account{% endblock %}
 {% block body %}
     <div class="row">
+        <div class="col my-3">
+            <img src="{% static 'lbwebsite/battle.net.png' %}" alt="battle.net logo" /><br />
+            <div class="btn-group" role="group" aria-label="Battle.Net Login">
+                <a href="{% url "social:begin" "battlenet-oauth2-us" %}" role="button" class="btn btn-primary">US</a>
+                <a href="{% url "social:begin" "battlenet-oauth2-eu" %}" role="button" class="btn btn-primary">EU</a>
+            </div>
+        </div>
+        <div class="col my-3">
+            <p>Welcome to your personalised management page of the bot. Here, you can configure each discord server's main character.
+                To fill the page with your characters, please click your region under the Battle.net logo</p>
+        </div>
+    </div>
+    <div class="row">
         <div class="col">
-            <h2>Login to Battle.Net</h2>
-            <a href="{% url "social:begin" "battlenet-oauth2-us" %}" class="nav-link">Login</a>
+            <h2>Your characters</h2>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Realm</th>
+                    <th scope="col">Region</th>
+                    <th scope="col">Guild</th>
+                    <th scope="col">Main Character for Discord Server</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for character in user.character_set.all %}
+                        <tr>
+                            <td><img src="http://render-us.worldofwarcraft.com/character/{{ character.thumbnail }}" alt="{{ character.name }}"/></td>
+                            <td>{{ character.name }}</td>
+                            <td>{{ character.server_slug }}</td>
+                            <td>{{ character.get_region_display }}</td>
+                            <td>{{ character.guild_name }}</td>
+                            <td>
+                                <form action="{% url 'update_character' character_id=character.pk%}" method="post">
+                                    {% csrf_token %}
+                                <select multiple name="servers" class="form-control form-control-sm">
+
+                                    <option disabled>None</option>
+                                    {% for server in servers %}
+                                        <option value="{{ server.id }}" {% for guild in character.main_for_guild.all %}{% if server.id == guild.guild_id %}selected{% endif %}{% endfor %}>{{ server.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                                </form>
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 {% endblock %}

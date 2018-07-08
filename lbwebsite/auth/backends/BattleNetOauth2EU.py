@@ -3,7 +3,7 @@ from social_core.backends.oauth import BaseOAuth2
 
 class BattleNetOAuth2EU(BaseOAuth2):
     """ battle.net Oauth2 backend"""
-    name = 'battlenet-oauth2-us'
+    name = 'battlenet-oauth2-eu'
     ID_KEY = 'id'
     REDIRECT_STATE = False
     AUTHORIZATION_URL = 'https://eu.battle.net/oauth/authorize'

@@ -66,7 +66,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'lbwebsite.context_processors.get_discord_servers'
+                'lbwebsite.context_processors.get_discord_servers_admin'
             ],
         },
     },
@@ -137,8 +137,8 @@ SOCIAL_AUTH_DISCORD_SECRET=os.getenv('DISCORD_SECRET')
 SOCIAL_AUTH_DISCORD_SCOPE=['guilds']
 SOCIAL_AUTH_BATTLENET_OAUTH2_US_KEY=os.getenv('BATTLENET_KEY')
 SOCIAL_AUTH_BATTLENET_OAUTH2_US_SECRET=os.getenv('BATTLENET_SECRET')
-SOCIAL_AUTH_BATTLENET_OAUTH2_EU_KEY=os.getenv('BATTLENET_KEY')
-SOCIAL_AUTH_BATTLENET_OAUTH2_EU_SECRET=os.getenv('BATTLENET_SECRET')
+SOCIAL_AUTH_BATTLENET_OAUTH2_EU_KEY=os.getenv('BATTLENET_EU_KEY')
+SOCIAL_AUTH_BATTLENET_OAUTH2_EU_SECRET=os.getenv('BATTLENET_EU_SECRET')
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
@@ -150,12 +150,20 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
-    'lbwebsite.auth.pipeline.battlenet_pipeline.save_characters'
+    'lbwebsite.auth.pipeline.battlenet_pipeline.save_characters',
+    'lbwebsite.auth.pipeline.discord_pipeline.update_guild_name'
 )
 
 SOCIAL_AUTH_LOGIN_REDIRECT_URL='/'
+SOCIAL_AUTH_NEW_ASSOCIATION_REDIRECT_URL='/myself'
 
 LOGIN_URL='/login/discord/'
 
 STATIC_URL = '/static/'
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cachetable',
+    }
+}
