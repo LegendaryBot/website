@@ -5,7 +5,7 @@ from django.dispatch import receiver
 
 
 class DiscordGuild(models.Model):
-    guild_id = models.IntegerField(primary_key=True)
+    guild_id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=200)
 
     def __str__(self):
