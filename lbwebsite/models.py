@@ -4,7 +4,7 @@ from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 
 
-class Guild(models.Model):
+class DiscordGuild(models.Model):
     guild_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=200)
 
@@ -13,12 +13,12 @@ class Guild(models.Model):
 
 
 class GuildPrefix(models.Model):
-    guild = models.ForeignKey(Guild, on_delete=models.CASCADE)
+    guild = models.ForeignKey(DiscordGuild, on_delete=models.CASCADE)
     prefix = models.CharField(max_length=10)
 
 
 class GuildCustomCommand(models.Model):
-    guild = models.ForeignKey(Guild, on_delete=models.CASCADE)
+    guild = models.ForeignKey(DiscordGuild, on_delete=models.CASCADE)
 
     TEXT = 1
 
@@ -30,7 +30,7 @@ class GuildCustomCommand(models.Model):
 
 
 class GuildServer(models.Model):
-    guild = models.ForeignKey(Guild, on_delete=models.CASCADE)
+    guild = models.ForeignKey(DiscordGuild, on_delete=models.CASCADE)
 
     US = 1
     EU = 2
@@ -68,7 +68,7 @@ class Character(models.Model):
     name = models.CharField(max_length=50)
     guild_name = models.CharField(max_length=50, null=True, blank=True)
     thumbnail = models.CharField(max_length=300)
-    main_for_guild = models.ManyToManyField(Guild)
+    main_for_guild = models.ManyToManyField(DiscordGuild)
 
     def __str__(self):
         return f"{self.user.username} - {self.region} - {self.server_slug} - {self.name} - {self.guild_name} - {self.thumbnail}"

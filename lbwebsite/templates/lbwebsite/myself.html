@@ -1,7 +1,14 @@
 {% extends 'template.html' %}
 {% load static %}
+{% load bootstrap4 %}
 {% block title %}My account{% endblock %}
 {% block body %}
+    <div class="row">
+        <div class="col">
+            {% bootstrap_messages %}
+        </div>
+    </div>
+
     <div class="row">
         <div class="col my-3">
             <img src="{% static 'lbwebsite/battle.net.png' %}" alt="battle.net logo" /><br />
@@ -41,8 +48,6 @@
                                 <form action="{% url 'update_character' character_id=character.pk%}" method="post">
                                     {% csrf_token %}
                                 <select multiple name="servers" class="form-control form-control-sm">
-
-                                    <option disabled>None</option>
                                     {% for server in servers %}
                                         <option value="{{ server.id }}" {% for guild in character.main_for_guild.all %}{% if server.id == guild.guild_id %}selected{% endif %}{% endfor %}>{{ server.name }}</option>
                                     {% endfor %}

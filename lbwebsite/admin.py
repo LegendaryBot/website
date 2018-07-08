@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Guild, GuildCustomCommand, GuildPrefix, GuildServer, Character
+from .models import DiscordGuild, GuildCustomCommand, GuildPrefix, GuildServer, Character
 
 
 class CharacterAdmin(admin.ModelAdmin):
@@ -11,7 +11,7 @@ class GuildAdmin(admin.ModelAdmin):
     list_display = ('guild_id', 'name')
 
 
-admin.site.register(Guild, GuildAdmin)
+admin.site.register(DiscordGuild, GuildAdmin)
 admin.site.register(GuildCustomCommand)
 admin.site.register(GuildPrefix)
 admin.site.register(GuildServer)

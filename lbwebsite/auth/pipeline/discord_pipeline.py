@@ -1,6 +1,6 @@
 import requests
 
-from lbwebsite.models import Guild
+from lbwebsite.models import DiscordGuild
 
 
 def update_guild_name(backend, user, response, *args, **kwargs):
@@ -10,8 +10,8 @@ def update_guild_name(backend, user, response, *args, **kwargs):
         json_value = response.json()
         for server in json_value:
             try:
-                guild = Guild.objects.get(pk=server['id'])
-            except Guild.DoesNotExist:
-                guild = Guild(pk=server['id'])
+                guild = DiscordGuild.objects.get(pk=server['id'])
+            except DiscordGuild.DoesNotExist:
+                guild = DiscordGuild(pk=server['id'])
             guild.name = server['name']
             guild.save()

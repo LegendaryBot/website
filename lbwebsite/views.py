@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 from django.shortcuts import render, redirect
 
 from lbwebsite.forms import PrefixForm
-from lbwebsite.models import Guild, GuildPrefix, Character
+from lbwebsite.models import DiscordGuild, GuildPrefix, Character
 from . import context_processors
 
 def is_server_admin(request,id):
@@ -31,9 +31,9 @@ def server(request, guild_id):
     if not is_server_admin(request, guild_id):
         return redirect('index')
     try:
-        guild = Guild.objects.get(pk=guild_id)
-    except Guild.DoesNotExist:
-        guild = Guild(guild_id=guild_id)
+        guild = DiscordGuild.objects.get(pk=guild_id)
+    except DiscordGuild.DoesNotExist:
+        guild = DiscordGuild(guild_id=guild_id)
         guild.save()
     return render(request, 'lbwebsite/server.html', {'guild': guild, 'prefix_form': PrefixForm()})
 
@@ -45,7 +45,7 @@ def server_prefix_post(request, guild_id):
         return redirect('server', guild_id=guild_id)
     form = PrefixForm(request.POST)
     if form.is_valid():
-        guild = Guild.objects.get(pk=guild_id)
+        guild = DiscordGuild.objects.get(pk=guild_id)
         prefix = GuildPrefix(prefix=form.cleaned_data['prefix'], guild=guild)
         prefix.save()
         messages.add_message(request, messages.SUCCESS, f'Prefix {prefix.prefix} added to the server!')
@@ -76,7 +76,7 @@ def myself_update(request, character_id):
         character = Character.objects.get(pk=character_id)
         if character.user == request.user:
             for server in selected_servers:
-                guild = Guild.objects.get(pk=server)
+                guild = DiscordGuild.objects.get(pk=server)
                 character.main_for_guild.add(guild)
         character.save()
         messages.add_message(request, messages.SUCCESS, f'Character {character.name} modified successfully.')
