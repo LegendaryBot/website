@@ -19,7 +19,7 @@ class GuildPrefix(models.Model):
 
 class GuildCustomCommand(models.Model):
     guild = models.ForeignKey(DiscordGuild, on_delete=models.CASCADE)
-
+    name = models.CharField(max_length=50)
     TEXT = 1
 
     choices = (
