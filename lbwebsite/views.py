@@ -1,19 +1,18 @@
-import requests
 from django.contrib import messages
 from django.contrib.auth import logout
-from django.contrib.auth.decorators import user_passes_test, login_required
+from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.shortcuts import render, redirect
 
 from lbwebsite.forms import PrefixForm
 from lbwebsite.models import DiscordGuild, GuildPrefix, Character
-from . import context_processors
 
-def is_server_admin(request,id):
+def is_server_admin(request,server_id):
     if request.user.is_superuser:
         return True
-    servers = context_processors.get_discord_servers(request)
-    for server in servers['servers_admin']:
-        if server['id'] == id:
+    servers = cache.get(f"discord_admin_cache:{request.user.id}")
+    for server in servers:
+        if server['id'] == int(server_id):
             return True
     return False
 
@@ -37,7 +36,7 @@ def server(request, guild_id):
         guild.save()
     return render(request, 'lbwebsite/server.html', {'guild': guild, 'prefix_form': PrefixForm()})
 
-
+@login_required
 def server_prefix_post(request, guild_id):
     if not is_server_admin(request, guild_id):
         return redirect('/')
@@ -53,7 +52,7 @@ def server_prefix_post(request, guild_id):
         messages.add_message(request, messages.ERROR, 'Prefix is invalid')
     return redirect('server', guild_id=guild_id)
 
-
+@login_required
 def server_remove_prefix(request, guild_id, prefix):
     if not is_server_admin(request, guild_id):
         return redirect('/')
