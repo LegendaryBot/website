@@ -5,7 +5,8 @@ from django.core.cache import cache
 from django.shortcuts import render, redirect
 
 from lbwebsite.forms import PrefixForm
-from lbwebsite.models import DiscordGuild, GuildPrefix, Character
+from lbwebsite.models import DiscordGuild, GuildPrefix, Character, GuildCustomCommand
+
 
 def is_server_admin(request,server_id):
     if request.user.is_superuser:
@@ -25,6 +26,7 @@ def logout_view(request):
     logout(request)
     return redirect('index')
 
+
 @login_required
 def server(request, guild_id):
     if not is_server_admin(request, guild_id):
@@ -35,6 +37,7 @@ def server(request, guild_id):
         guild = DiscordGuild(guild_id=guild_id)
         guild.save()
     return render(request, 'lbwebsite/server.html', {'guild': guild, 'prefix_form': PrefixForm()})
+
 
 @login_required
 def server_prefix_post(request, guild_id):
@@ -52,6 +55,7 @@ def server_prefix_post(request, guild_id):
         messages.add_message(request, messages.ERROR, 'Prefix is invalid')
     return redirect('server', guild_id=guild_id)
 
+
 @login_required
 def server_remove_prefix(request, guild_id, prefix):
     if not is_server_admin(request, guild_id):
@@ -60,6 +64,19 @@ def server_remove_prefix(request, guild_id, prefix):
     if prefix:
         prefix.delete()
         messages.add_message(request, messages.SUCCESS, f'Prefix {prefix} removed from the server!')
+    return redirect('server', guild_id=guild_id)
+
+
+@login_required
+def server_remove_custom_command(request, guild_id, command_name):
+    if not is_server_admin(request, guild_id):
+        return redirect('/')
+    custom_command = GuildCustomCommand.objects.filter(guild_id=guild_id, name=command_name).first()
+    if custom_command:
+        custom_command.delete()
+        messages.add_message(request, messages.SUCCESS, f"Command {command_name} removed!")
+    else:
+        messages.add_message(request, messages.ERROR, f"Command {command_name} not found!")
     return redirect('server', guild_id=guild_id)
 
 

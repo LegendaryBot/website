@@ -40,7 +40,30 @@
         </form>
     </div>
     <div class="col">
+        <div class="alert alert-primary" role="alert">
+            Custom Commands
+        </div>
+        {% if guild.guildcustomcommand_set.count > 0 %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Text</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for custom_command in guild.guildcustomcommand_set.all %}
+                    <tr>
+                        <td>{{ custom_command.name }}</td>
+                        <td>{{ custom_command.value }}</td>
+                        <td><a href="{% url 'server_remove_custom_command' guild_id=guild.guild_id command_name=custom_command.name %}"><button type="button" class="btn btn-danger">Delete</button></a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
+        {% endif %}
     </div>
 
 </div>
