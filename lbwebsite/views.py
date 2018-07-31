@@ -3,19 +3,12 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.shortcuts import render, redirect
+from django.views.decorators.http import require_POST
 
-from lbwebsite.forms import PrefixForm
-from lbwebsite.models import DiscordGuild, GuildPrefix, Character, GuildCustomCommand
+from lbwebsite.decorators import is_server_admin
+from lbwebsite.forms import PrefixForm, GuildServerForm
+from lbwebsite.models import DiscordGuild, GuildPrefix, Character, GuildCustomCommand, GuildServer
 
-
-def is_server_admin(request,server_id):
-    if request.user.is_superuser:
-        return True
-    servers = cache.get(f"discord_admin_cache:{request.user.id}")
-    for server in servers:
-        if server['id'] == int(server_id):
-            return True
-    return False
 
 
 def index(request):
@@ -28,23 +21,20 @@ def logout_view(request):
 
 
 @login_required
+@is_server_admin
 def server(request, guild_id):
-    if not is_server_admin(request, guild_id):
-        return redirect('index')
     try:
         guild = DiscordGuild.objects.get(pk=guild_id)
     except DiscordGuild.DoesNotExist:
         guild = DiscordGuild(guild_id=guild_id)
         guild.save()
-    return render(request, 'lbwebsite/server.html', {'guild': guild, 'prefix_form': PrefixForm()})
+    return render(request, 'lbwebsite/server.html', {'guild': guild, 'prefix_form': PrefixForm(), 'guild_server_form': GuildServerForm()})
 
 
 @login_required
+@require_POST
+@is_server_admin
 def server_prefix_post(request, guild_id):
-    if not is_server_admin(request, guild_id):
-        return redirect('/')
-    if not request.POST:
-        return redirect('server', guild_id=guild_id)
     form = PrefixForm(request.POST)
     if form.is_valid():
         guild = DiscordGuild.objects.get(pk=guild_id)
@@ -57,9 +47,8 @@ def server_prefix_post(request, guild_id):
 
 
 @login_required
+@is_server_admin
 def server_remove_prefix(request, guild_id, prefix):
-    if not is_server_admin(request, guild_id):
-        return redirect('/')
     prefix = GuildPrefix.objects.filter(prefix=prefix, guild_id=guild_id).first()
     if prefix:
         prefix.delete()
@@ -68,15 +57,50 @@ def server_remove_prefix(request, guild_id, prefix):
 
 
 @login_required
+@is_server_admin
 def server_remove_custom_command(request, guild_id, command_name):
-    if not is_server_admin(request, guild_id):
-        return redirect('/')
     custom_command = GuildCustomCommand.objects.filter(guild_id=guild_id, name=command_name).first()
     if custom_command:
         custom_command.delete()
         messages.add_message(request, messages.SUCCESS, f"Command {command_name} removed!")
     else:
         messages.add_message(request, messages.ERROR, f"Command {command_name} not found!")
+    return redirect('server', guild_id=guild_id)
+
+
+@login_required
+@require_POST
+@is_server_admin
+def server_add_guild_server(request, guild_id):
+    form = GuildServerForm(request.POST)
+    if form.is_valid():
+        guild_server = form.save(commit=False)
+        try:
+            GuildServer.objects.get(guild_id=guild_id, default=True)
+        except GuildServer.DoesNotExist:
+            guild_server.default = True
+        guild_server.guild = DiscordGuild.objects.get(pk=guild_id)
+        guild_server.save()
+        messages.add_message(request, messages.SUCCESS, 'Server added!')
+    else:
+        messages.add_message(request, messages.ERROR, 'The Server is invalid!')
+    return redirect('server', guild_id=guild_id)
+
+
+@login_required
+@is_server_admin
+def server_make_default_guild_server(request, guild_id, guild_server_id):
+    try:
+        guild_server = GuildServer.objects.get(guild_id=guild_id, pk=guild_server_id)
+
+        guild_server_default = GuildServer.objects.get(guild_id=guild_id, default=True)
+        guild_server_default.default = False
+        guild_server_default.save()
+        guild_server.default = True
+        guild_server.save()
+        messages.add_message(request, messages.SUCCESS, 'The server has been set as the default one!')
+    except GuildServer.DoesNotExist:
+        messages.add_message(request, messages.ERROR, 'The server you want to set as default does not exist!')
     return redirect('server', guild_id=guild_id)
 
 

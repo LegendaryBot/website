@@ -67,4 +67,46 @@
     </div>
 
 </div>
+<div class="row my-3">
+    <div class="col">
+        <div class="alert alert-primary" role="alert">
+            WoW Servers
+        </div>
+        <p>LegendaryBot supports multiple guilds to be configured under a single Discord server.</p>
+        {% if guild.guildserver_set.count > 0 %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Region</th>
+                        <th>Realm</th>
+                        <th>Guild</th>
+                        <th>Default</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for guild_server in guild.guildserver_set.all %}
+                    <tr>
+                        <td>{{ guild_server.get_region_display }}</td>
+                        <td>{{ guild_server.server_slug }}</td>
+                        <td>{{ guild_server.guild_name }}</td>
+                        <td>{{ guild_server.default }}</td>
+                        <td>{% if not guild_server.default %}<a href="{% url 'server_default_guild_server' guild_id=guild.guild_id guild_server_id=guild_server.pk %}"><button type="button" class="btn btn-primary">Make Default</button></a> {% endif %}<a href="#"><button type="button" class="btn btn-danger">Delete</button></a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+        <h2>Add a server</h2>
+        <form action="{% url 'server_add_guild_server' guild_id=guild.guild_id %}" method="post">
+            {% csrf_token %}
+            {% bootstrap_form guild_server_form %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            {% endbuttons %}
+
+
+        </form>
+    </div>
+</div>
 {% endblock %}
