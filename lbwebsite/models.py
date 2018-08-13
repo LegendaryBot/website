@@ -52,6 +52,26 @@ class GuildServer(models.Model):
     default = models.BooleanField(default=False)
 
 
+class RealmConnected(models.Model):
+    US = 1
+    EU = 2
+    TW = 3
+    KR = 4
+
+    choices = (
+        (US, "US"),
+        (EU, "EU"),
+        (TW, "TW"),
+        (KR, "KR")
+    )
+    region = models.IntegerField(choices=choices, default=US)
+    server_slug = models.CharField(max_length=50)
+    connected_realm = models.ManyToManyField('self')
+
+    def __str__(self):
+        return f"{self.region} - {self.server_slug}"
+
+
 class Character(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -83,6 +103,10 @@ class Character(models.Model):
 
     class Meta:
         unique_together = (('region', 'server_slug', 'name'))
+
+
+
+
 
 @receiver(m2m_changed, sender=Character.main_for_guild.through)
 def verify_uniqueness_character_guild(sender, **kwargs):

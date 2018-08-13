@@ -1,14 +1,15 @@
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.core.cache import cache
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 
 from lbwebsite.decorators import is_server_admin
 from lbwebsite.forms import PrefixForm, GuildServerForm
-from lbwebsite.models import DiscordGuild, GuildPrefix, Character, GuildCustomCommand, GuildServer
-
+from lbwebsite.models import DiscordGuild, GuildPrefix, Character, GuildCustomCommand, GuildServer, RealmConnected
+from lbwebsite.utils import get_battlenet_oauth
 
 
 def index(request):
@@ -122,3 +123,31 @@ def myself_update(request, character_id):
                     character.save()
         messages.add_message(request, messages.SUCCESS, f'Character {character.name} modified successfully.')
     return redirect('myself')
+
+
+@login_required
+@staff_member_required
+def update_realm(request):
+    oauth = get_battlenet_oauth('us')
+    params = {
+        "locale": "en_US",
+        "namespace": "dynamic-us"
+    }
+    result = oauth.get("https://us.api.battle.net/data/wow/connected-realm/", params=params)
+    if result.ok:
+        RealmConnected.objects.all().delete()
+        connected_realms_json = result.json()
+        for realm_entry in connected_realms_json['connected_realms']:
+            connected_realm_entry_bnet = oauth.get(realm_entry['href'])
+            realms = []
+            if connected_realm_entry_bnet.ok:
+                connected_realm_entry_json = connected_realm_entry_bnet.json()
+                for connected_realm_entry in connected_realm_entry_json['realms']:
+                    realm_database_entry = RealmConnected()
+                    realm_database_entry.server_slug = connected_realm_entry['slug']
+                    realm_database_entry.save()
+                    for realm in realms:
+                        realm_database_entry.connected_realm.add(realm)
+                        realm_database_entry.save()
+                    realms.append(realm_database_entry)
+    return HttpResponse("Done!")
