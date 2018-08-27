@@ -40,6 +40,3 @@ RUN set -ex \
         && pip install -r requirements.txt \
         && pip install -U git+https://github.com/python-social-auth/social-core.git \
         && apk del .build-deps
-RUN python manage.py migrate
-RUN python manage.py collectstatic
-CMD ["gunicorn", "legendarybot.wsgi:application", "--workers 3", "-b 0.0.0.0:8000"]
