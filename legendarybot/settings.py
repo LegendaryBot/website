@@ -20,12 +20,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'z_hx_t#p#ch54n)j*%zglp!_4dm1_b%0+yr+8cc$m5@z1=wq_c'
+SECRET_KEY = os.getenv("SECRET_KEY",'z_hx_t#p#ch54n)j*%zglp!_4dm1_b%0+yr+8cc$m5@z1=wq_c')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", False)
 
-ALLOWED_HOSTS = ["django", "localhost"]
+ALLOWED_HOSTS = ["django", "localhost", "legendarybot.info"]
 
 
 # Application definition
@@ -81,11 +81,11 @@ WSGI_APPLICATION = 'legendarybot.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'postgres',
-        'PORT': '5432',
+        'NAME': os.getenv('DATABASE_NAME', 'legendarybot'),
+        'USER': os.getenv('DATABASE_USER', 'legendarybot'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'legendarybot'),
+        'HOST': os.getenv('DATABASE_HOST', 'localhost'),
+        'PORT': os.getenv('DATABASE_PORT', '5432'),
     }
 }
 
