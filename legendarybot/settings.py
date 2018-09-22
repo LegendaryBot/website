@@ -131,7 +131,7 @@ STATIC_ROOT = 'static'
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.discord.DiscordOAuth2',
+    'lbwebsite.auth.backends.discord.DiscordOAuth2',
     'lbwebsite.auth.backends.BattleNetOauth2EU.BattleNetOAuth2EU',
     'lbwebsite.auth.backends.BattleNetOauth2US.BattleNetOAuth2US',
     'django.contrib.auth.backends.ModelBackend',
