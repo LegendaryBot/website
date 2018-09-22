@@ -6,6 +6,8 @@ from lbwebsite.Permissions import Permissions
 
 def get_discord_servers_admin(request):
     if request.user.is_authenticated:
+        if 'admin' in request.META['PATH_INFO']:
+            return {}
         if cache.get(f"discord_cache:{request.user.id}"):
             return {'servers_admin': cache.get(f"discord_admin_cache:{request.user.id}"), 'servers': cache.get(f"discord_cache:{request.user.id}")}
         social = request.user.social_auth.get(provider='discord')

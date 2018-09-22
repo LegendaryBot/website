@@ -8,8 +8,8 @@ def get_battlenet_oauth(region: str):
         client_id = settings.SOCIAL_AUTH_BATTLENET_OAUTH2_US_KEY
         client_secret = settings.SOCIAL_AUTH_BATTLENET_OAUTH2_US_SECRET
     else:
-        client_id = settings.EU_KEY
-        client_secret = settings.EU_SECRET
+        client_id = settings.SOCIAL_AUTH_BATTLENET_OAUTH2_EU_KEY
+        client_secret = settings.SOCIAL_AUTH_BATTLENET_OAUTH2_EU_SECRET
     client = BackendApplicationClient(client_id=client_id)
     oauth = OAuth2Session(client=client)
     oauth.fetch_token(token_url=f"https://{region}.battle.net/oauth/token", client_id=client_id, client_secret=client_secret)

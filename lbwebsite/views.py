@@ -127,15 +127,15 @@ def myself_update(request, character_id):
 
 @login_required
 @staff_member_required
-def update_realm(request):
-    oauth = get_battlenet_oauth('us')
+def update_realm(request, region):
+    oauth = get_battlenet_oauth(region)
     params = {
         "locale": "en_US",
-        "namespace": "dynamic-us"
+        "namespace": f"dynamic-{region}"
     }
-    result = oauth.get("https://us.api.battle.net/data/wow/connected-realm/", params=params)
+    result = oauth.get(f"https://{region}.api.battle.net/data/wow/connected-realm/", params=params)
     if result.ok:
-        RealmConnected.objects.all().delete()
+        RealmConnected.objects.filter(region=1 if region.upper() == "US" else 2).all().delete()
         connected_realms_json = result.json()
         for realm_entry in connected_realms_json['connected_realms']:
             connected_realm_entry_bnet = oauth.get(realm_entry['href'])
@@ -144,6 +144,7 @@ def update_realm(request):
                 connected_realm_entry_json = connected_realm_entry_bnet.json()
                 for connected_realm_entry in connected_realm_entry_json['realms']:
                     realm_database_entry = RealmConnected()
+                    realm_database_entry.region = 1 if region.upper() == "US" else 2
                     realm_database_entry.server_slug = connected_realm_entry['slug']
                     realm_database_entry.save()
                     for realm in realms:
