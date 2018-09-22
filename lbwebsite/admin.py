@@ -4,7 +4,9 @@ from .models import DiscordGuild, GuildCustomCommand, GuildPrefix, GuildServer, 
 
 
 class CharacterAdmin(admin.ModelAdmin):
-    list_display = ('user', 'region', 'server_slug', 'name')
+    def get_main_guild(self, obj):
+        return " |".join([r.name for r in obj.main_for_guild.all()])
+    list_display = ('user', 'region', 'server_slug', 'name', 'get_main_guild')
 
 
 class GuildAdmin(admin.ModelAdmin):

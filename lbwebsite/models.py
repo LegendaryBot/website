@@ -91,7 +91,7 @@ class Character(models.Model):
         (KR, "KR"),
     )
     region = models.IntegerField(choices=choices, default=US)
-    server_slug = models.CharField(max_length=50)
+    server_slug = models.CharField(max_length=50, verbose_name="Realm")
     name = models.CharField(max_length=50)
     guild_name = models.CharField(max_length=50, null=True, blank=True)
     thumbnail = models.CharField(max_length=300)
