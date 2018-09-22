@@ -15,6 +15,9 @@ class DiscordGuild(models.Model):
 class GuildPrefix(models.Model):
     guild = models.ForeignKey(DiscordGuild, on_delete=models.CASCADE)
     prefix = models.CharField(max_length=10)
+    
+    class Meta:
+        unique_together = (('guild', 'prefix'))
 
 
 class GuildCustomCommand(models.Model):
@@ -50,7 +53,8 @@ class GuildServer(models.Model):
     server_slug = models.CharField(max_length=50)
     guild_name = models.CharField(max_length=50, null=True)
     default = models.BooleanField(default=False)
-
+    class Meta:
+        unique_together = ("guild","region","server_slug","guild_name")
 
 class RealmConnected(models.Model):
     US = 1
