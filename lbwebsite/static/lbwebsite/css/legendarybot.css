@@ -2,3 +2,7 @@ body {
     background: url("/static/lbwebsite/WoW_BattleForAzeroth_Voldun_3840x2160-min.jpg");
     background-size: cover;
 }
+.row {
+    background-color: rgba(171,171,171,0.6);
+
+}
