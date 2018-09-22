@@ -127,7 +127,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/static'
+STATIC_ROOT = 'static'
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 AUTHENTICATION_BACKENDS = (
@@ -163,8 +163,6 @@ SOCIAL_AUTH_LOGIN_REDIRECT_URL='/'
 SOCIAL_AUTH_NEW_ASSOCIATION_REDIRECT_URL='/myself'
 
 LOGIN_URL='/login/discord/'
-
-STATIC_URL = '/static/'
 
 CACHES = {
     'default': {
