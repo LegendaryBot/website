@@ -16,6 +16,7 @@ class RealmConnectedAdmin(admin.ModelAdmin):
         return " | ".join([r.server_slug for r in obj.connected_realm.all()])
 
     list_display = ('region', 'server_slug', 'get_connected_realms')
+    search_fields = ('server_slug', )
 
 
 admin.site.register(DiscordGuild, GuildAdmin)
