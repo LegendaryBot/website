@@ -119,6 +119,12 @@ class GuildRank(models.Model):
     class Meta:
         unique_together = ("guild", "wow_guild", "rank_id")
 
+class GuildSetting(models.Model):
+    guild = models.ForeignKey(DiscordGuild, on_delete=models.CASCADE)
+    setting_name = models.CharField(max_length=100)
+    setting_value = models.CharField(max_length=1000)
+    class Meta:
+        unique_together = ("guild", "setting_name")
 
 @receiver(m2m_changed, sender=Character.main_for_guild.through)
 def verify_uniqueness_character_guild(sender, **kwargs):
