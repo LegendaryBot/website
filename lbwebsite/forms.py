@@ -5,7 +5,7 @@ from django.forms import ModelForm
 from django.conf import settings
 from slugify import slugify
 
-from lbwebsite.models import GuildServer
+from lbwebsite.models import GuildServer, GuildRank
 
 
 class PrefixForm(forms.Form):
@@ -24,3 +24,13 @@ class GuildServerForm(ModelForm):
         if not r.ok:
             raise ValidationError('Guild not found on the realm!')
         return self.cleaned_data
+
+
+class GuildRankForm(ModelForm):
+    class Meta:
+        model = GuildRank
+        fields = ['wow_guild', 'rank_id', 'discord_rank']
+
+    def __init__(self, guild, *args, **kwargs):
+        super (GuildRankForm,self ).__init__(*args,**kwargs)
+        self.fields['wow_guild'].queryset = GuildServer.objects.filter(guild=guild)

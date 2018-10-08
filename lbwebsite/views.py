@@ -7,8 +7,9 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 
 from lbwebsite.decorators import is_server_admin
-from lbwebsite.forms import PrefixForm, GuildServerForm
-from lbwebsite.models import DiscordGuild, GuildPrefix, Character, GuildCustomCommand, GuildServer, RealmConnected
+from lbwebsite.forms import PrefixForm, GuildServerForm, GuildRankForm
+from lbwebsite.models import DiscordGuild, GuildPrefix, Character, GuildCustomCommand, GuildServer, RealmConnected, \
+    GuildRank
 from lbwebsite.utils import get_battlenet_oauth
 
 
@@ -29,7 +30,7 @@ def server(request, guild_id):
     except DiscordGuild.DoesNotExist:
         guild = DiscordGuild(guild_id=guild_id)
         guild.save()
-    return render(request, 'lbwebsite/server.html', {'guild': guild, 'prefix_form': PrefixForm(), 'guild_server_form': GuildServerForm()})
+    return render(request, 'lbwebsite/server.html', {'guild': guild, 'prefix_form': PrefixForm(), 'guild_server_form': GuildServerForm(), 'guild_rank_form': GuildRankForm(guild)})
 
 
 @login_required
@@ -124,6 +125,50 @@ def myself_update(request, character_id):
         messages.add_message(request, messages.SUCCESS, f'Character {character.name} modified successfully.')
     return redirect('myself')
 
+
+@is_server_admin
+@login_required
+def server_remove_guild_server(request,guild_id, guild_server_id):
+    guild_server = GuildServer.objects.get(guild_id=guild_id, pk=guild_server_id)
+    guild_server.delete()
+    if guild_server.default:
+        guild_server_new_default = GuildServer.objects.filter(guild_id=guild_id).first()
+        if guild_server_new_default:
+            guild_server_new_default.default = True
+            guild_server_new_default.save()
+            messages.add_message(request, messages.SUCCESS, f"Guild removed. Guild {guild_server_new_default.guild_name} set as default.")
+        else:
+            messages.add_message(request, messages.SUCCESS, "Guild removed!")
+    else:
+        messages.add_message(request, messages.SUCCESS, f"Guild removed.")
+    return redirect('server', guild_id=guild_id)
+
+
+@login_required
+@require_POST
+@is_server_admin
+def server_add_rank(request, guild_id):
+    form = GuildRankForm(DiscordGuild.objects.get(pk=guild_id), request.POST)
+    if form.is_valid():
+        guild_rank = form.save(commit=False)
+        if guild_rank.wow_guild.guild.guild_id == int(guild_id):
+            guild_rank.guild = DiscordGuild.objects.get(pk=guild_id)
+            guild_rank.save()
+            messages.add_message(request, messages.SUCCESS, f"Rank added!")
+        else:
+            messages.add_message(request, messages.ERROR, f"This Guild doesn't exist! Please select a valid guild")
+    else:
+        messages.add_message(request, messages.ERROR, "Error in the rank form. Please fix the errors.")
+    return redirect('server', guild_id=guild_id)
+
+
+@login_required
+@is_server_admin
+def server_remove_rank(request, guild_id, rank_id):
+    guild_rank = GuildRank.objects.get(pk=rank_id, guild_id=guild_id)
+    guild_rank.delete()
+    messages.add_message(request, messages.SUCCESS, f"Rank removed!")
+    return redirect('server', guild_id=guild_id)
 
 @login_required
 @staff_member_required

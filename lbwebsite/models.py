@@ -56,6 +56,9 @@ class GuildServer(models.Model):
     class Meta:
         unique_together = ("guild","region","server_slug","guild_name")
 
+    def __str__(self):
+        return f"{self.server_slug}-{self.choices[self.region - 1][1]} | {self.guild_name}"
+
 class RealmConnected(models.Model):
     US = 1
     EU = 2
@@ -108,8 +111,13 @@ class Character(models.Model):
     class Meta:
         unique_together = (('region', 'server_slug', 'name'))
 
-
-
+class GuildRank(models.Model):
+    guild = models.ForeignKey(DiscordGuild, on_delete=models.CASCADE)
+    wow_guild = models.ForeignKey(GuildServer, on_delete=models.CASCADE)
+    rank_id = models.IntegerField(verbose_name="Rank ID")
+    discord_rank = models.CharField(verbose_name="Discord Rank", max_length=200)
+    class Meta:
+        unique_together = ("guild", "wow_guild", "rank_id")
 
 
 @receiver(m2m_changed, sender=Character.main_for_guild.through)
