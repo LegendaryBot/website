@@ -23,19 +23,30 @@ class RealmConnectedAdmin(admin.ModelAdmin):
     list_display = ('region', 'server_slug', 'get_connected_realms')
     search_fields = ('server_slug', )
 
+class GuildPrefixAdmin(admin.ModelAdmin):
+    list_display = ('guild', 'prefix')
+    search_fields = ('guild__name', 'guild__guild_id', 'prefix')
 
 class GuildRankAdmin(admin.ModelAdmin):
     list_display = ('guild','rank_id', 'discord_rank')
+    search_fields = ('guild__name', 'guild__guild_id', 'rank_id', 'discord_rank')
 
+class GuildCustomCommandAdmin(admin.ModelAdmin):
+    list_display = ('guild', 'name', 'type', 'value')
+    search_fields = ('guild__name', 'guild__guild_id', 'name')
 
 class GuildSettingAdmin(admin.ModelAdmin):
     list_display = ('guild', 'setting_name', 'setting_value')
+    search_fields = ('guild__name', 'guild__guild_id', 'setting_name')
 
+class GuildServerAdmin(admin.ModelAdmin):
+    list_display = ('guild', 'region', 'server_slug', 'guild_name', 'default')
+    search_fields = ('guild__name', 'guild__guild_id', 'region', 'server_slug', 'guild_name')
 
 admin.site.register(DiscordGuild, GuildAdmin)
-admin.site.register(GuildCustomCommand)
-admin.site.register(GuildPrefix)
-admin.site.register(GuildServer)
+admin.site.register(GuildCustomCommand, GuildCustomCommandAdmin)
+admin.site.register(GuildPrefix, GuildPrefixAdmin)
+admin.site.register(GuildServer, GuildServerAdmin)
 admin.site.register(Character, CharacterAdmin)
 admin.site.register(RealmConnected, RealmConnectedAdmin)
 admin.site.register(GuildRank, GuildRankAdmin)
