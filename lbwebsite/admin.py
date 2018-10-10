@@ -8,7 +8,7 @@ class CharacterAdmin(admin.ModelAdmin):
     def get_main_guild(self, obj):
         return " |".join([r.name for r in obj.main_for_guild.all()])
     list_display = ('user', 'region', 'server_slug', 'name', 'get_main_guild')
-    search_fields = ('user__username', 'name')
+    search_fields = ('user__username', 'name', 'main_for_guild__name')
 
 
 class GuildAdmin(admin.ModelAdmin):
