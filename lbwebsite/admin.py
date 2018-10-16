@@ -13,6 +13,7 @@ class CharacterAdmin(admin.ModelAdmin):
 
 class GuildAdmin(admin.ModelAdmin):
     list_display = ('guild_id', 'name')
+    search_fields = ('guild_id', 'name')
 
 
 class RealmConnectedAdmin(admin.ModelAdmin):
