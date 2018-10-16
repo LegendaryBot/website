@@ -117,11 +117,14 @@ def myself_update(request, character_id):
         selected_servers = request.POST.getlist('servers')
         character = Character.objects.get(pk=character_id)
         if character.user == request.user:
-            for server in selected_servers:
-                guild = DiscordGuild.objects.get(pk=server)
-                if guild:
-                    character.main_for_guild.add(guild)
-                    character.save()
+            if selected_servers:
+                for server in selected_servers:
+                    guild = DiscordGuild.objects.get(pk=server)
+                    if guild:
+                        character.main_for_guild.add(guild)
+                        character.save()
+            else:
+                character.main_for_guild.clear()
         messages.add_message(request, messages.SUCCESS, f'Character {character.name} modified successfully.')
     return redirect('myself')
 
