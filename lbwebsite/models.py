@@ -98,7 +98,7 @@ class Character(models.Model):
     name = models.CharField(max_length=50)
     guild_name = models.CharField(max_length=50, null=True, blank=True)
     thumbnail = models.CharField(max_length=300)
-    main_for_guild = models.ManyToManyField(DiscordGuild)
+    main_for_guild = models.ManyToManyField(DiscordGuild, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.region} - {self.server_slug} - {self.name} - {self.guild_name} - {self.thumbnail}"
