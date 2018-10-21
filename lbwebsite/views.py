@@ -10,7 +10,7 @@ from lbwebsite.decorators import is_server_admin
 from lbwebsite.forms import PrefixForm, GuildServerForm, GuildRankForm
 from lbwebsite.models import DiscordGuild, GuildPrefix, Character, GuildCustomCommand, GuildServer, RealmConnected, \
     GuildRank
-from lbwebsite.utils import get_battlenet_oauth
+from lbwebsite.utils import execute_battlenet_request
 
 
 def index(request):
@@ -175,17 +175,16 @@ def server_remove_rank(request, guild_id, rank_id):
 @login_required
 @staff_member_required
 def update_realm(request, region):
-    oauth = get_battlenet_oauth(region)
     params = {
         "locale": "en_US",
         "namespace": f"dynamic-{region}"
     }
-    result = oauth.get(f"https://{region}.api.battle.net/data/wow/connected-realm/", params=params)
+    result = execute_battlenet_request(f"https://{region}.api.blizzard.com/data/wow/connected-realm/", params=params)
     if result.ok:
         RealmConnected.objects.filter(region=1 if region.upper() == "US" else 2).all().delete()
         connected_realms_json = result.json()
         for realm_entry in connected_realms_json['connected_realms']:
-            connected_realm_entry_bnet = oauth.get(realm_entry['href'])
+            connected_realm_entry_bnet = execute_battlenet_request(realm_entry['href'])
             realms = []
             if connected_realm_entry_bnet.ok:
                 connected_realm_entry_json = connected_realm_entry_bnet.json()
