@@ -1,11 +1,10 @@
-import requests
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
-from django.conf import settings
 from slugify import slugify
 
 from lbwebsite.models import GuildServer, GuildRank
+from lbwebsite.utils import execute_battlenet_request
 
 
 class PrefixForm(forms.Form):
@@ -20,7 +19,7 @@ class GuildServerForm(ModelForm):
     def clean(self):
         # We check if the server & guild exists.
         self.cleaned_data['server_slug'] = slugify(self.cleaned_data['server_slug'])
-        r = requests.get(f"https://{dict(GuildServer.choices)[self.cleaned_data['region']]}.api.battle.net/wow/guild/{self.cleaned_data['server_slug']}/{self.cleaned_data['guild_name']}", params={"apikey": settings.SOCIAL_AUTH_BATTLENET_OAUTH2_US_KEY})
+        r = execute_battlenet_request(f"https://{dict(GuildServer.choices)[self.cleaned_data['region']]}.api.blizzard.com/wow/guild/{self.cleaned_data['server_slug']}/{self.cleaned_data['guild_name']}")
         if not r.ok:
             raise ValidationError('Guild not found on the realm!')
         return self.cleaned_data

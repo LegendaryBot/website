@@ -27,7 +27,7 @@ class BattleNetOAuth2EU(BaseOAuth2):
             params['locale'] = self.setting('API_LOCALE')
 
         response = self.get_json(
-            'https://eu.api.battle.net/wow/user/characters',
+            'https://eu.api.blizzard.com/wow/user/characters',
             params=params
         )
         return response.get('characters') or []
@@ -39,6 +39,6 @@ class BattleNetOAuth2EU(BaseOAuth2):
     def user_data(self, access_token, *args, **kwargs):
         """ Loads user data from service """
         return self.get_json(
-            'https://eu.api.battle.net/account/user',
+            'https://eu.api.battle.net/oauth/userinfo',
             params={'access_token': access_token}
         )
